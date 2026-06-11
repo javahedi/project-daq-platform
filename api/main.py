@@ -1,34 +1,13 @@
 from fastapi import FastAPI
 
-from daq_core.storage import SQLiteSampleRepository
+from api.routes.status import router as status_router
+from api.routes.samples import router as samples_router
 
 
-app = FastAPI()
+app = FastAPI(
+    title="DAQ Platform API",
+    version="0.1.0",
+)
 
-repo = SQLiteSampleRepository("data/daq.db")
-
-
-@app.get("/status")
-def status():
-    return {
-        "status": "running"
-    }
-
-
-@app.get("/samples/count")
-def get_sample_count():
-    return {
-        "count": repo.get_sample_count()
-    }
-
-@app.get("/samples/latest")
-def get_latest_sample():
-
-    sample = repo.get_latest_sample()
-
-    if sample is None:
-        return {
-            "sample": None
-        }
-
-    return sample.to_dict()
+app.include_router(status_router)
+app.include_router(samples_router)
