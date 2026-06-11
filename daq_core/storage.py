@@ -30,6 +30,9 @@ class SQLiteSampleRepository:
 
         self.connection.commit()
 
+    
+    
+
 
     def insert_sample(self, sample: SensorSample) -> None:
         self.connection.execute(
@@ -59,6 +62,18 @@ class SQLiteSampleRepository:
         self.connection.commit()
 
 
+    def _row_to_sample(self, row) -> SensorSample:
+        return SensorSample(
+            sensor_id=row[0],
+            timestamp_ns=row[1],
+            value=row[2],
+            unit=row[3],
+            quality=Quality(row[4]),
+            source=row[5],
+            location=row[6],
+        )
+    
+    
     def get_latest_sample(self) -> SensorSample | None:
         cursor = self.connection.execute(
             """
@@ -81,12 +96,4 @@ class SQLiteSampleRepository:
         if row is None:
             return None
 
-        return SensorSample(
-            sensor_id=row[0],
-            timestamp_ns=row[1],
-            value=row[2],
-            unit=row[3],
-            quality=Quality(row[4]),
-            source=row[5],
-            location=row[6],
-        )
+        return self._row_to_sample(row)
