@@ -104,6 +104,71 @@ class SQLiteSampleRepository:
         return self._row_to_sample(row)
     
 
+    def get_sample_count(self) -> int:
+        cursor = self.connection.execute(
+            """
+            SELECT COUNT(*)
+            FROM samples
+            """
+        )
+
+        row = cursor.fetchone()
+
+        return row[0]
+    
+    def get_recent_samples(self, limit: int = 100) -> list[SensorSample]:
+        cursor = self.connection.execute(
+            """
+            SELECT
+                sensor_id,
+                timestamp_ns,
+                value,
+                unit,
+                quality,
+                source,
+                location
+            FROM samples
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        )
+
+        rows = cursor.fetchall()
+
+        return [self._row_to_sample(row) for row in rows]
+    
+    def get_samples_by_sensor(
+        self,
+        sensor_id: str,
+        limit: int = 100,
+    ) -> list[SensorSample]:
+        cursor = self.connection.execute(
+            """
+            SELECT
+                sensor_id,
+                timestamp_ns,
+                value,
+                unit,
+                quality,
+                source,
+                location
+            FROM samples
+            WHERE sensor_id = ?
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (sensor_id, limit),
+        )
+
+        rows = cursor.fetchall()
+
+        return [self._row_to_sample(row) for row in rows]
+    
+
+
+    
+
 
 class StorageWorker:
     def __init__(

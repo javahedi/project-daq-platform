@@ -29,6 +29,10 @@ try:
 
         if latest is not None:
             print(latest.to_dict())
+            print("count:", repo.get_sample_count())
+
+            recent = repo.get_recent_samples(limit=3)
+            print([s.to_dict() for s in recent])
 
         time.sleep(1)
 
