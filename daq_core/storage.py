@@ -138,11 +138,9 @@ class SQLiteSampleRepository:
 
         return [self._row_to_sample(row) for row in rows]
     
-    def get_samples_by_sensor(
-        self,
-        sensor_id: str,
-        limit: int = 100,
-    ) -> list[SensorSample]:
+    
+    
+    def get_samples_by_sensor(self, sensor_id: str, limit: int = 100 ) -> list[SensorSample]:
         cursor = self.connection.execute(
             """
             SELECT
