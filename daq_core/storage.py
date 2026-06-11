@@ -10,7 +10,11 @@ class SQLiteSampleRepository:
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
-        self.connection = sqlite3.connect(self.db_path)
+        self.connection = sqlite3.connect(
+                self.db_path,
+                check_same_thread=False, # Allow this SQLite connection to be used from another thread.
+            )
+    
         self._create_tables()
 
     def _create_tables(self) -> None:
