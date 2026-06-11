@@ -15,15 +15,13 @@ router = APIRouter(
 def get_sensor_ids(
     repo: SQLiteSampleRepository = Depends(get_repository),
 ):
-    return {
-    "sensors": repo.get_sensor_ids()
-}
+    return { "sensors": repo.get_sensor_ids() }
 
 
 @router.get("/{sensor_id}/samples")
 def get_samples_for_sensor(
     sensor_id: str,
-    limit: int = 100,
+    limit: int = 10,
     repo: SQLiteSampleRepository = Depends(get_repository),
 ):
     samples = repo.get_samples_by_sensor(
@@ -31,7 +29,12 @@ def get_samples_for_sensor(
         limit=limit,
     )
 
-    return [
-        sample.to_dict()
-        for sample in samples
-    ]
+    return [ sample.to_dict() for sample in samples]
+
+
+@router.get("/{sensor_id}/statistics")
+def get_sensor_statistics(
+    sensor_id: str,
+    repo: SQLiteSampleRepository = Depends(get_repository),
+):
+    return repo.get_sensor_statistics(sensor_id)

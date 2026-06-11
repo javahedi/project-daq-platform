@@ -164,14 +164,14 @@ class SQLiteSampleRepository:
         return [self._row_to_sample(row) for row in rows]
     
 
-    def get_sensor(self) -> list[str]:
-        cursor = self.connection.execute(
-            """
-            SELECT DISTINCT sensor_id
-            FROM samples
-            ORDER BY sensor_id;
-            """
-        )
+    # def get_sensor(self) -> list[str]:
+    #     cursor = self.connection.execute(
+    #         """
+    #         SELECT DISTINCT sensor_id
+    #         FROM samples
+    #         ORDER BY sensor_id;
+    #         """
+    #     )
 
     def get_sensor_ids(self) -> list[str]:
         cursor = self.connection.execute(
@@ -185,6 +185,32 @@ class SQLiteSampleRepository:
         rows = cursor.fetchall()
 
         return [row[0] for row in rows]
+    
+
+
+    def get_sensor_statistics(self, sensor_id: str) -> dict:
+        cursor = self.connection.execute(
+            """
+            SELECT
+                COUNT(*),
+                MIN(value),
+                MAX(value),
+                AVG(value)
+            FROM samples
+            WHERE sensor_id = ?
+            """,
+            (sensor_id,),
+        )
+
+        row = cursor.fetchone()
+
+        return {
+            "sensor_id": sensor_id,
+            "count": row[0],
+            "min": row[1],
+            "max": row[2],
+            "avg": row[3],
+        }
 
 
     
