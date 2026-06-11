@@ -17,3 +17,6 @@ __pycache__/
 *_old.py
 
 data/*.db
+
+logs/
+*.log

@@ -1,4 +1,7 @@
 import sqlite3
+import logging
+logger = logging.getLogger(__name__)
+
 from pathlib import Path
 from threading import Thread, Event
 from daq_core.message_bus import MessageBus
@@ -14,6 +17,8 @@ class SQLiteSampleRepository:
                 self.db_path,
                 check_same_thread=False, # Allow this SQLite connection to be used from another thread.
             )
+        
+        logger.info("Connected to SQLite database: %s", self.db_path)
     
         self._create_tables()
 
@@ -237,13 +242,17 @@ class StorageWorker:
         )
 
     def start(self) -> None:
+        logger.info("Starting storage worker")
         self.thread.start()
 
     def stop(self) -> None:
+        logger.info("Stopping storage worker")
         self.stop_event.set()
         self.thread.join()
 
+
     def _run(self) -> None:
+        logger.info("Storage worker loop started")
         while not self.stop_event.is_set():
             try:
                 sample = self.bus.consume(timeout=1.0)

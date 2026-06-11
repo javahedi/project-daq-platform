@@ -1,8 +1,10 @@
 import time
+import logging
+logger = logging.getLogger(__name__)
+
 from threading import Thread, Event
 from daq_core.message_bus import MessageBus  # Adjust this import to match your folder structure
 from daq_core.sensors import Sensor
-
 
 class AcquisitionEngine:
 
@@ -24,10 +26,12 @@ class AcquisitionEngine:
             daemon=True,
         )
 
-    def start(self):
+    def start(self) -> None:
+        logger.info("Starting acquisition engine")
         self.thread.start()
 
-    def stop(self):
+    def stop(self) -> None:
+        logger.info("Stopping acquisition engine")
         self.stop_event.set()
         self.thread.join()
 

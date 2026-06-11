@@ -1,4 +1,9 @@
 import time
+import logging
+from daq_core.logging_config import setup_logging
+setup_logging()
+logger = logging.getLogger(__name__)
+logger.info("Starting DAQ platform")
 
 from daq_core.acquisition import AcquisitionEngine
 from daq_core.config import load_config
@@ -8,6 +13,7 @@ from daq_core.storage import SQLiteSampleRepository, StorageWorker
 
 
 config = load_config("config.yaml")
+logger.info("Loaded configuration")
 
 bus = InMemoryMessageBus(
     maxsize=config["message_bus"]["max_size"]
@@ -18,7 +24,7 @@ repo = SQLiteSampleRepository(
 )
 
 engines = []
-
+logger.info("Starting %d acquisition engines", len(engines))
 for sensor_config in config["sensors"]:
     sensor = create_sensor(sensor_config)
 
@@ -51,7 +57,8 @@ except KeyboardInterrupt:
     storage_worker.stop()
 
     print("Stopped")
-    
+    logger.info("Stopped DAQ platform")
+
 
 # try:
 #     while True:
