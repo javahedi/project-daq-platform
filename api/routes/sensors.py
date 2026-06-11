@@ -18,3 +18,20 @@ def get_sensor_ids(
     return {
     "sensors": repo.get_sensor_ids()
 }
+
+
+@router.get("/{sensor_id}/samples")
+def get_samples_for_sensor(
+    sensor_id: str,
+    limit: int = 100,
+    repo: SQLiteSampleRepository = Depends(get_repository),
+):
+    samples = repo.get_samples_by_sensor(
+        sensor_id=sensor_id,
+        limit=limit,
+    )
+
+    return [
+        sample.to_dict()
+        for sample in samples
+    ]
