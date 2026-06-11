@@ -19,6 +19,9 @@ def get_sample_count(
     }
 
 
+
+
+
 @router.get("/latest")
 def get_latest_sample(
     repo: SQLiteSampleRepository = Depends(get_repository),

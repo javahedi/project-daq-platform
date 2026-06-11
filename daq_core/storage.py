@@ -164,6 +164,32 @@ class SQLiteSampleRepository:
         return [self._row_to_sample(row) for row in rows]
     
 
+    def get_sensor(self) -> list[str]:
+        cursor = self.connection.execute(
+            """
+            SELECT DISTINCT sensor_id
+            FROM samples
+            ORDER BY sensor_id;
+            """
+        )
+
+    def get_sensor_ids(self) -> list[str]:
+        cursor = self.connection.execute(
+            """
+            SELECT DISTINCT sensor_id
+            FROM samples
+            ORDER BY sensor_id
+            """
+        )
+
+        rows = cursor.fetchall()
+
+        return [row[0] for row in rows]
+
+
+    
+   
+
 
     
 
