@@ -1,0 +1,21 @@
+database:
+  path: data/daq.db
+
+message_bus:
+  max_size: 1000
+
+sensors:
+  - sensor_id: TEMP_001
+    type: temperature
+    location: LAB_001
+    sample_rate_hz: 5
+
+  - sensor_id: TEMP_002
+    type: temperature
+    location: LAB_002
+    sample_rate_hz: 2
+
+  - sensor_id: PRESS_001
+    type: pressure
+    location: LAB_001
+    sample_rate_hz: 1
