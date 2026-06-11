@@ -1,6 +1,7 @@
 import sqlite3
 from pathlib import Path
-
+from threading import Thread, Event
+from daq_core.message_bus import MessageBus
 from daq_core.models import SensorSample, Quality
 
 
@@ -73,7 +74,7 @@ class SQLiteSampleRepository:
             location=row[6],
         )
     
-    
+
     def get_latest_sample(self) -> SensorSample | None:
         cursor = self.connection.execute(
             """
@@ -97,3 +98,37 @@ class SQLiteSampleRepository:
             return None
 
         return self._row_to_sample(row)
+    
+
+
+class StorageWorker:
+    def __init__(
+        self,
+        bus: MessageBus,
+        repository: SQLiteSampleRepository,
+    ):
+        self.bus = bus
+        self.repository = repository
+
+        self.stop_event = Event()
+
+        self.thread = Thread(
+            target=self._run,
+            daemon=True,
+        )
+
+    def start(self) -> None:
+        self.thread.start()
+
+    def stop(self) -> None:
+        self.stop_event.set()
+        self.thread.join()
+
+    def _run(self) -> None:
+        while not self.stop_event.is_set():
+            try:
+                sample = self.bus.consume(timeout=1.0)
+                self.repository.insert_sample(sample)
+
+            except TimeoutError:
+                continue
