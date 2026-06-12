@@ -3,12 +3,15 @@ import websockets
 
 
 async def main():
-    uri = "ws://127.0.0.1:8000/ws/samples"
+    #uri = "ws://127.0.0.1:8000/ws/samples"
+    #uri = "ws://127.0.0.1:8000/ws/samples/TEMP_001"
+    uri = "ws://127.0.0.1:8000/ws/statistics/TEMP_001"
 
     async with websockets.connect(uri) as websocket:
         while True:
             message = await websocket.recv()
             print(message)
+
 
 
 asyncio.run(main())
