@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 from pathlib import Path
 from threading import Thread, Event
-from daq_core.message_bus import MessageBus
+from daq_core.message_bus import MessageBus, Subscriber
 from daq_core.models import SensorSample, Quality
 
 
@@ -221,17 +221,13 @@ class SQLiteSampleRepository:
     
    
 
-
-    
-
-
 class StorageWorker:
     def __init__(
         self,
-        bus: MessageBus,
+        subscriber: Subscriber,
         repository: SQLiteSampleRepository,
     ):
-        self.bus = bus
+        self.subscriber = subscriber
         self.repository = repository
 
         self.stop_event = Event()
@@ -250,13 +246,51 @@ class StorageWorker:
         self.stop_event.set()
         self.thread.join()
 
-
     def _run(self) -> None:
         logger.info("Storage worker loop started")
+
         while not self.stop_event.is_set():
             try:
-                sample = self.bus.consume(timeout=1.0)
+                sample = self.subscriber.consume(timeout=1.0)
                 self.repository.insert_sample(sample)
 
             except TimeoutError:
                 continue
+    
+
+
+# class StorageWorker:
+#     def __init__(
+#         self,
+#         bus: MessageBus,
+#         repository: SQLiteSampleRepository,
+#     ):
+#         self.bus = bus
+#         self.repository = repository
+
+#         self.stop_event = Event()
+
+#         self.thread = Thread(
+#             target=self._run,
+#             daemon=True,
+#         )
+
+#     def start(self) -> None:
+#         logger.info("Starting storage worker")
+#         self.thread.start()
+
+#     def stop(self) -> None:
+#         logger.info("Stopping storage worker")
+#         self.stop_event.set()
+#         self.thread.join()
+
+
+#     def _run(self) -> None:
+#         logger.info("Storage worker loop started")
+#         while not self.stop_event.is_set():
+#             try:
+#                 sample = self.bus.consume(timeout=1.0)
+#                 self.repository.insert_sample(sample)
+
+#             except TimeoutError:
+#                 continue

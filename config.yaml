@@ -2,6 +2,7 @@ database:
   path: data/daq.db
 
 message_bus:
+  type: broadcast   # options: in_memory, broadcast
   max_size: 1000
 
 sensors:
