@@ -10,6 +10,7 @@ from daq_core.config import load_config
 from daq_core.message_bus import InMemoryMessageBus, BroadcastMessageBus
 from daq_core.sensor_factory import create_sensor
 from daq_core.storage import SQLiteSampleRepository, StorageWorker
+from daq_core.runtime import live_bus
 
 logger.info("Starting DAQ platform")
 config = load_config("config.yaml")
@@ -26,8 +27,7 @@ if bus_type == "in_memory":
     storage_subscriber = bus
 
 elif bus_type == "broadcast":
-    bus = BroadcastMessageBus()
-
+    bus = live_bus
     storage_subscriber = bus.subscribe()
 
 else:

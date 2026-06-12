@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from api.routes.status import router as status_router
 from api.routes.samples import router as samples_router
 from api.routes.sensors import router as sources_router
+from api.routes.live import router as live_router
 
 
 app = FastAPI(
@@ -13,3 +14,4 @@ app = FastAPI(
 app.include_router(status_router)
 app.include_router(sources_router)
 app.include_router(samples_router)
+app.include_router(live_router)
