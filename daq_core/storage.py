@@ -216,6 +216,32 @@ class SQLiteSampleRepository:
             "max": row[2],
             "avg": row[3],
         }
+    
+    def get_sensor_details(self) -> list[dict]:
+        cursor = self.connection.execute(
+            """
+            SELECT
+                sensor_id,
+                location,
+                unit,
+                source
+            FROM samples
+            GROUP BY sensor_id, location, unit, source
+            ORDER BY sensor_id
+            """
+        )
+
+        rows = cursor.fetchall()
+
+        return [
+            {
+                "sensor_id": row[0],
+                "location": row[1],
+                "unit": row[2],
+                "source": row[3],
+            }
+            for row in rows
+        ]
 
 
     

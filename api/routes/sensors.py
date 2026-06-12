@@ -38,3 +38,12 @@ def get_sensor_statistics(
     repo: SQLiteSampleRepository = Depends(get_repository),
 ):
     return repo.get_sensor_statistics(sensor_id)
+
+
+@router.get("/details")
+def get_sensor_details(
+    repo: SQLiteSampleRepository = Depends(get_repository),
+):
+    return {
+        "sensors": repo.get_sensor_details()
+    }
