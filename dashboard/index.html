@@ -5,106 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quantum DAQ Dashboard</title>
 
-    <link rel="stylesheet"
-          href="/dashboard-static/css/dashboard.css">
+    <link rel="stylesheet" href="/dashboard-static/css/dashboard.css">
 
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 </head>
 
 <body>
 
-    <header class="header">
-        <h1>Quantum DAQ Platform</h1>
-        <div id="connection-status">
-            ● Connected
+<header class="header">
+    <h1>Quantum DAQ Platform</h1>
+    <div id="connection-status">● Connected</div>
+</header>
+
+<main>
+
+    <section class="overview">
+        <div class="card">
+            <h3>Sensors</h3>
+            <p id="sensor-count">--</p>
         </div>
-    </header>
 
-    <main>
+        <div class="card">
+            <h3>Samples</h3>
+            <p id="sample-count">--</p>
+        </div>
+    </section>
 
-        <section class="overview">
+    <section class="sensor-panels">
 
-            <div class="card">
-                <h3>Sensors</h3>
-                <p id="sensor-count">3</p>
+        <div class="card">
+            <h2>Temperature</h2>
+
+            <select id="temperature-sensor"></select>
+
+            <h1 id="temperature-value">--</h1>
+
+            <div id="temperature-chart" class="chart"></div>
+
+            <div class="mini-stats">
+                <span>Count: <b id="temperature-stat-count">--</b></span>
+                <span>Min: <b id="temperature-stat-min">--</b></span>
+                <span>Max: <b id="temperature-stat-max">--</b></span>
+                <span>Avg: <b id="temperature-stat-avg">--</b></span>
             </div>
+        </div>
 
-            <div class="card">
-                <h3>Samples</h3>
-                <p id="sample-count">0</p>
+        <div class="card">
+            <h2>Pressure</h2>
+
+            <select id="pressure-sensor"></select>
+
+            <h1 id="pressure-value">--</h1>
+
+            <div id="pressure-chart" class="chart"></div>
+
+            <div class="mini-stats">
+                <span>Count: <b id="pressure-stat-count">--</b></span>
+                <span>Min: <b id="pressure-stat-min">--</b></span>
+                <span>Max: <b id="pressure-stat-max">--</b></span>
+                <span>Avg: <b id="pressure-stat-avg">--</b></span>
             </div>
+        </div>
 
-        </section>
+    </section>
 
-        <section class="sensor-panels">
+</main>
 
-            <div class="card">
-
-                <h2>Temperature</h2>
-
-                <select id="temperature-sensor">
-                   
-                </select>
-
-                <h1 id="temperature-value">
-                    --
-                </h1>
-
-                <div
-                    id="temperature-chart"
-                    class="chart"
-                ></div>
-
-            </div>
-
-            <div class="card">
-
-                <h2>Pressure</h2>
-
-                <select id="pressure-sensor">
-                    
-                </select>
-
-                <h1 id="pressure-value">
-                    --
-                </h1>
-
-                <div
-                    id="pressure-chart"
-                    class="chart"
-                ></div>
-
-            </div>
-
-        </section>
-
-        <section class="statistics">
-
-            <div class="card stat-card">
-                <h3>Count</h3>
-                <p id="stat-count">--</p>
-            </div>
-
-            <div class="card stat-card">
-                <h3>Min</h3>
-                <p id="stat-min">--</p>
-            </div>
-
-            <div class="card stat-card">
-                <h3>Max</h3>
-                <p id="stat-max">--</p>
-            </div>
-
-            <div class="card stat-card">
-                <h3>Average</h3>
-                <p id="stat-avg">--</p>
-            </div>
-
-        </section>
-
-    </main>
-
-    <script src="/dashboard-static/js/dashboard.js"></script>
+<script src="/dashboard-static/js/dashboard.js"></script>
 
 </body>
 </html>

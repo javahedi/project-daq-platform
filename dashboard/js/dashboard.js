@@ -1,10 +1,11 @@
 let temperatureSocket = null;
 let pressureSocket = null;
 
+let temperatureStatsSocket = null;
+let pressureStatsSocket = null;
+
 let temperatureChart = null;
 let pressureChart = null;
-
-let statisticsSocket = null;
 
 const MAX_POINTS = 100;
 
@@ -53,6 +54,19 @@ function createLineChart(elementId, title, unit) {
     return chart;
 }
 
+function resetChart(chart) {
+    chart.setOption({
+        xAxis: {
+            data: []
+        },
+        series: [
+            {
+                data: []
+            }
+        ]
+    });
+}
+
 function addPoint(chart, timestampNs, value) {
     const option = chart.getOption();
 
@@ -88,6 +102,13 @@ async function loadSensorDetails() {
     return data.sensors;
 }
 
+async function loadSampleCount() {
+    const response = await fetch("/samples/count");
+    const data = await response.json();
+
+    document.getElementById("sample-count").textContent = data.count;
+}
+
 function populateSelect(selectId, sensors) {
     const select = document.getElementById(selectId);
 
@@ -101,7 +122,7 @@ function populateSelect(selectId, sensors) {
     });
 }
 
-function connectSensorStream(sensorId, chart, valueElementId, unit) {
+function connectSensorStream(sensorId, chart, valueElementId) {
     const socket = new WebSocket(
         `ws://${window.location.host}/ws/samples/${sensorId}`
     );
@@ -120,48 +141,51 @@ function connectSensorStream(sensorId, chart, valueElementId, unit) {
     };
 
     socket.onopen = () => {
-        console.log(`Connected to ${sensorId}`);
+        console.log(`Sample stream connected: ${sensorId}`);
     };
 
     socket.onclose = () => {
-        console.log(`Disconnected from ${sensorId}`);
+        console.log(`Sample stream disconnected: ${sensorId}`);
     };
 
     return socket;
 }
 
-
-
-function connectStatisticsStream(sensorId) {
-    if (statisticsSocket) {
-        statisticsSocket.close();
-    }
-
-    statisticsSocket = new WebSocket(
+function connectStatisticsStream(sensorId, prefix) {
+    const socket = new WebSocket(
         `ws://${window.location.host}/ws/statistics/${sensorId}`
     );
 
-    statisticsSocket.onmessage = event => {
+    socket.onmessage = event => {
         const stats = JSON.parse(event.data);
 
         if (stats.type === "heartbeat") {
             return;
         }
 
-        document.getElementById("stat-count").textContent =
+        document.getElementById(`${prefix}-stat-count`).textContent =
             stats.count;
 
-        document.getElementById("stat-min").textContent =
+        document.getElementById(`${prefix}-stat-min`).textContent =
             stats.min.toFixed(3);
 
-        document.getElementById("stat-max").textContent =
+        document.getElementById(`${prefix}-stat-max`).textContent =
             stats.max.toFixed(3);
 
-        document.getElementById("stat-avg").textContent =
+        document.getElementById(`${prefix}-stat-avg`).textContent =
             stats.avg.toFixed(3);
     };
-}
 
+    socket.onopen = () => {
+        console.log(`Statistics stream connected: ${sensorId}`);
+    };
+
+    socket.onclose = () => {
+        console.log(`Statistics stream disconnected: ${sensorId}`);
+    };
+
+    return socket;
+}
 
 async function initializeDashboard() {
     const sensors = await loadSensorDetails();
@@ -173,6 +197,8 @@ async function initializeDashboard() {
     populateSelect("pressure-sensor", pressureSensors);
 
     document.getElementById("sensor-count").textContent = sensors.length;
+
+    await loadSampleCount();
 
     temperatureChart = createLineChart(
         "temperature-chart",
@@ -194,14 +220,22 @@ async function initializeDashboard() {
             temperatureSocket.close();
         }
 
+        if (temperatureStatsSocket) {
+            temperatureStatsSocket.close();
+        }
+
+        resetChart(temperatureChart);
+
         temperatureSocket = connectSensorStream(
             temperatureSelect.value,
             temperatureChart,
-            "temperature-value",
-            "°C"
+            "temperature-value"
         );
 
-        connectStatisticsStream(temperatureSelect.value);
+        temperatureStatsSocket = connectStatisticsStream(
+            temperatureSelect.value,
+            "temperature"
+        );
     }
 
     function connectPressure() {
@@ -209,11 +243,21 @@ async function initializeDashboard() {
             pressureSocket.close();
         }
 
+        if (pressureStatsSocket) {
+            pressureStatsSocket.close();
+        }
+
+        resetChart(pressureChart);
+
         pressureSocket = connectSensorStream(
             pressureSelect.value,
             pressureChart,
-            "pressure-value",
-            "bar"
+            "pressure-value"
+        );
+
+        pressureStatsSocket = connectStatisticsStream(
+            pressureSelect.value,
+            "pressure"
         );
     }
 
@@ -222,6 +266,8 @@ async function initializeDashboard() {
 
     connectTemperature();
     connectPressure();
+
+    setInterval(loadSampleCount, 3000);
 }
 
 initializeDashboard();
